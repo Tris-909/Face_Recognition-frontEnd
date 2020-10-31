@@ -6,8 +6,6 @@ import SpinnerLoading from './components/Spinner/Spinner';
 import styled from 'styled-components';
 import './App.css';
 import Particles from 'react-particles-js';
-import Options from './components/Options/Options';
-import ChooseFile from './components/ChooseFile/ChooseFile';
 
 const particlesOptions = 
   {
@@ -42,7 +40,6 @@ function App() {
   const [imageUrl, setImageUrl] = useState('');
   const [boundingBox, setBoundingBox] = useState([]);
   const [loading, setLoading]  = useState(false); 
-  const [options, setOptions] = useState('ImgURL');
 
   const onChangeHandler = (event) => {
     setInput(event.target.value);
@@ -51,7 +48,7 @@ function App() {
   const onButtonSubmit = () => {
     setLoading(true);
     setImageUrl(input);
-    console.log(imageUrl);
+    console.log(input);
     const Clarifai = require('clarifai');
       
     // Instantiate a new Clarifai app by passing in your API key.
@@ -68,41 +65,11 @@ function App() {
       });
   }
 
-  const onChooseFileSubmit = () => {
-    setLoading(true);
-    console.log(imageUrl);
-    const Clarifai = require('clarifai');
-      
-    // Instantiate a new Clarifai app by passing in your API key.
-    const app = new Clarifai.App({apiKey: 'f7a07536db1144a2976fffdbe7ca41cd'});
-    // Predict the contents of an image by passing in a URL.
-    app.models.predict(Clarifai.FACE_DETECT_MODEL, input)
-      .then(response => {
-        setBoundingBox(response.outputs[0].data.regions);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.log(err);
-        setLoading(false);
-      });
-  }
-
-  const displayOptions = () => {
-    if (options === 'ImgURL') {
-      return(
-        <ImageLinkForm onInputChange={(e) => onChangeHandler(e)} input={input} onSubmit={onButtonSubmit} />
-      );
-    }
-    return(
-      <ChooseFile setImgURL={setImageUrl} onChangeInputHandler={onChangeHandler} onSubmit={onChooseFileSubmit} />
-    )
-  }
 
   const MainContent = (
       <Container>
         <Rank />
-        <Options options={options} setOptions={setOptions}/>
-        {displayOptions()}
+        <ImageLinkForm onInputChange={(e) => onChangeHandler(e)} input={input} onSubmit={onButtonSubmit} />
         { loading === true ?  <SpinnerLoading /> : ( imageUrl.length > 0 ? <FaceRecognition imageUrl={imageUrl} boundingBox={boundingBox} /> : null ) } 
       </Container>
   );
